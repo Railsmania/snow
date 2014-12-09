@@ -1,0 +1,97 @@
+#!/usr/bin/env ruby
+$:.unshift(File.dirname(__FILE__) + '/../lib') unless $:.include?(File.dirname(__FILE__) + '/../lib')
+
+require 'uri'
+require 'net/http'
+require 'gli'
+require 'snow'
+
+include GLI::App
+
+program_desc 'Snow controls a lesson system'
+
+version Snow::VERSION
+
+subcommand_option_handling :normal
+arguments :strict
+
+#TODO: read this from a configuration yml file
+DROPBOX_ROOT = '~/dropbox_railsmania/Dropbox/'
+
+#desc 'Describe some switch here'
+#switch [:s,:switch]
+
+#desc 'Describe some flag here'
+#default_value 'the default'
+#arg_name 'The name of the argument'
+#flag [:f,:flagname]
+
+desc 'List all the lessons'
+arg_name 'Describe arguments to list here'
+command :list do |c|
+#  c.desc 'Describe a switch to list'
+#  c.switch :s
+
+#  c.desc 'Describe a flag to list'
+#  c.default_value 'default'
+#  c.flag :f
+  c.action do |global_options,options,args|
+
+    # TODO: check sergio workflow
+    # TODO: check if lesson is in site?
+    # TODO: offline/cache
+
+    all_md_files = ScriptsDir.new.all_md_files
+
+    # leave only short names, we lose the real filename
+    md_files = all_md_files.map{|file| file.gsub(/.*data\/scripts\//, '')}
+
+    es_files = md_files.select{|filename| filename.end_with?('_es.md')}
+    en_files = md_files.select{|filename| filename.end_with?('_en.md')}
+    ja_files = md_files.select{|filename| filename.end_with?('_ja.md')}
+
+    files_without_language = md_files - es_files - en_files - ja_files
+    if !files_without_language.empty?
+      puts "WARNING, these files do not have a language: #{files_without_language}"
+    end
+
+    lesson_names = en_files.map { |en_file| en_file.gsub('_en.md', '')}
+
+    dropbox_dir = DropboxDir.new(DROPBOX_ROOT)
+
+    puts "#{'lesson name'.rjust(55)}#{'English?'.rjust(10)}#{'Spanish?'.rjust(10)}\
+#{'Japanese?'.rjust(10)}#{'project?'.rjust(10)},#{'video_pub?'.rjust(10)},#{'video_pub_es?'.rjust(10)}"
+
+    lesson_names.each do |name|
+      en_exists = en_files.include?(name + '_en.md') ? 'yes' : 'no'
+      es_exists = es_files.include?(name + '_es.md') ? 'yes' : 'no'
+      ja_exists = ja_files.include?(name + '_ja.md') ? 'yes' : 'no'
+      camtasia  = dropbox_dir.has_lesson?(name) ? 'yes' : 'no'
+      video_published_en = VideoManager.new.video_published?(name, :en) ? 'yes' : 'no'
+      video_published_es = VideoManager.new.video_published?(name, :es) ? 'yes' : 'no'
+
+      puts "#{name.rjust(55)}#{en_exists.rjust(10)}#{es_exists.rjust(10)}#{ja_exists.rjust(10)}\
+#{camtasia.rjust(10)}#{video_published_en.rjust(10)}#{video_published_es.rjust(10)}"
+    end
+
+  end
+end
+
+desc 'Create a new lesson[TODO]'
+arg_name 'Describe arguments to new here'
+command :new do |c|
+  c.action do |global_options,options,args|
+    puts "new command ran"
+  end
+end
+
+desc 'Shows the status of a lesson[TODO]'
+arg_name 'Describe arguments to status here'
+command :status do |c|
+  c.action do |global_options,options,args|
+    puts "status command ran"
+  end
+end
+
+
+exit run(ARGV)

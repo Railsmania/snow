@@ -1,0 +1,11 @@
+= snow
+
+Tool to control the current status of our lessons
+
+Execute
+```
+snow list
+```
+
+To see it in action
+
