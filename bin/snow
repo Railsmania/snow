@@ -63,7 +63,7 @@ command :list do |c|
 #{'Japanese?'.rjust(10)}#{'project?'.rjust(10)},#{'video_pub?'.rjust(10)},#{'video_pub_es?'.rjust(10)}"
 
     lesson_names.each do |name|
-      en_exists = en_files.include?(name + '_en.md') ? 'yes' : 'no'
+      en_exists = ScriptsDir.new.status?(name + '_en.md')
       es_exists = es_files.include?(name + '_es.md') ? 'yes' : 'no'
       ja_exists = ja_files.include?(name + '_ja.md') ? 'yes' : 'no'
       camtasia  = dropbox_dir.has_lesson?(name) ? 'yes' : 'no'

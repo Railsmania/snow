@@ -15,6 +15,17 @@ class ScriptsDir
     md_files.delete_if{|filename| filename.end_with?('alt.md')}
   end
 
+  def status?(file)
+    path = File.join(dir, file)
+    first_line = File.open(path, &:readline)
+    puts first_line
+    if first_line && first_line.match(/\s*\[(.*)\]\s*/)
+      first_line.match(/\s*\[(.*)\]\s*/)[1]
+    else
+      'yes'
+    end
+  end
+
 
   private
   def pull_or_clone_repo
