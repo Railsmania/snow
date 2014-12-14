@@ -13,6 +13,7 @@ spec = Gem::Specification.new do |s|
   s.bindir = 'bin'
   s.executables << 'snow'
   s.add_development_dependency('aruba')
+  s.add_development_dependency('byebug')
 
   s.add_runtime_dependency('gli','2.12.2')
   s.add_runtime_dependency('faraday', '~> 0.9')

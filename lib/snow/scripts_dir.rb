@@ -15,14 +15,31 @@ class ScriptsDir
     md_files.delete_if{|filename| filename.end_with?('alt.md')}
   end
 
+  def done?(file)
+    status?(file) == 'done'
+  end
+
   def status?(file)
     path = File.join(dir, file)
     first_line = File.open(path, &:readline)
     if first_line && first_line.match(/\s*\[(.*)\]\s*/)
       first_line.match(/\s*\[(.*)\]\s*/)[1]
     else
-      'yes'
+      'done'
     end
+  rescue Errno::ENOENT
+    'no file'
+  end
+
+  def lesson_title(file)
+    contents = File.read(File.join(dir, file))
+    if contents && contents.match(/#\s?(.*)\s?\n/)
+      contents.match(/#\s?(.*)\s?\n/)[1]
+    else
+      'no-title'
+    end
+  rescue Errno::ENOENT
+    'no-title'
   end
 
 
