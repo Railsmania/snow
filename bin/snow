@@ -46,6 +46,9 @@ command :list do |c|
     # TODO: check sergio workflow
     # TODO: check if lesson is in site?
     # TODO: offline/cache
+    # TODO: do not show DONE lines
+    # TODO: keep a file in dropbox so sergio can see status
+
      
     all_md_files = ScriptsDir.new.all_md_files
     
