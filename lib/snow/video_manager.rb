@@ -41,7 +41,7 @@ class VideoManager
     if legacy_files[language][lesson_name]
       url = root + legacy_files[language][lesson_name].to_s
     else
-      url = root + lesson_name + '_' + language.to_s
+      url = root + lesson_name.split('/').last + '_' + language.to_s + '.mp4'
     end
     uri = URI(url)
     request = Net::HTTP.new uri.host
