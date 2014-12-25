@@ -6,6 +6,7 @@ require 'net/http'
 require 'gli'
 require 'snow'
 require 'byebug'
+require 'yaml'
 
 include GLI::App
 
@@ -19,6 +20,8 @@ arguments :strict
 #TODO: read this from a configuration yml file
 DROPBOX_ROOT = '~/dropbox_railsmania/Dropbox/'
 
+CACHE_FILE = File.join(Dir.home, '.snow_cache')
+
 #desc 'Describe some switch here'
 #switch [:o,:offline]
 
@@ -31,6 +34,40 @@ DROPBOX_ROOT = '~/dropbox_railsmania/Dropbox/'
 def column(text)
   text.rjust(20)
 end
+
+def read_cache_file
+  if File.exists?(CACHE_FILE)
+    YAML.load_file(CACHE_FILE) || []
+  else
+    []
+  end
+end
+
+def write_cache_file(data)
+  File.open(CACHE_FILE,"w+") do |f|
+    YAML.dump(data,f)
+  end
+end
+
+def discover_lesson_statutes(lesson_names)
+  cached_done = read_cache_file
+  lesson_names.inject({}) do |results, name|
+    if cached_done.include?(name)
+      en_status = 'DONE'
+      es_status = 'DONE'
+    else
+      en_status = LessonStatus.new.lesson_status(name, :en)
+      es_status = if LessonStatus.script_done?(en_status)
+        LessonStatus.new.lesson_status(name, :es) 
+      else
+        'NA'
+      end
+    end
+    results[name] = [en_status, es_status]
+    results
+  end
+end
+
 
 desc 'List all the lessons'
 arg_name 'Describe arguments to list here'
@@ -65,20 +102,19 @@ command :list do |c|
     end
     
     lesson_names = en_files.map { |en_file| en_file.gsub('_en.md', '')}
+    puts "Processing all the lessons' status"
+    lesson_statuses = discover_lesson_statutes(lesson_names)
+    done_lessons = lesson_statuses.select{|name, results| results.all?{|value| value == 'DONE'}}
+    
+    write_cache_file(done_lessons)
     
     puts "#{'lesson name'.rjust(55)}#{column('English status')}#{column('Spanish status')}"
 #{column('Japanese status')}"
-
-    lesson_names.each do |name|
-      
-      en_status = LessonStatus.new.lesson_status(name, :en)
-      es_status = if LessonStatus.script_done?(en_status)
-        LessonStatus.new.lesson_status(name, :es) 
-      else
-        'NA'
-      end
-      puts "#{name.rjust(55)}#{column(en_status)}#{column(es_status)}" #{column(ja_status)}"
+    lesson_statuses.each_pair do |name, statuses|
+      puts "#{name.rjust(55)}#{column(statuses[0])}#{column(statuses[1])}" #{column(ja_status)}"
     end
+    puts
+    puts "We have completed #{done_lessons.size} lessons in all languages!"
 
   end
 end
