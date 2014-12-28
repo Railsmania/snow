@@ -17,7 +17,8 @@ class VideoManager
         'foundation/routing/3.add_restful_to_resourcefuL_routes' => '3.en.foundation.routes.restful_resourceful_routes.mp4',
         'foundation/gems/1.basics' => '1.en.foundation.gems.basic.mp4',
         'foundation/gems/2.versioning' => '2.en.gems_versioning.mp4',
-        'foundation/gems/3.advance_gemfile_lock_and_sources' => '3.en.gems_local_rubygems_lock_file.mp4'
+        'foundation/gems/3.advance_gemfile_lock_and_sources' => '3.en.gems_local_rubygems_lock_file.mp4',
+        'foundation/terminal/1.introduction_terminal_commands' => '1.en.foundation.terminal.introduction_terminal_commands.mp4'
       },
       es: {
         "bob/bob01" => "themed_bob_01_es.mp4",
