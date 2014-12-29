@@ -39,8 +39,8 @@ class DropboxDir
     files(shared_translations_dir, 'md').include?(lesson_name + '.md')
   end
 
-  def has_original_video?(lesson)
-    false
+  def has_original_video?(lesson_name)
+    files(shared_translations_dir, 'mp4').include?(lesson_name + '.mp4')
   end
   def has_translated_video?(lesson)
     false
